@@ -1,0 +1,12 @@
+## Interface: 80300
+## Title: Shopping List
+## Notes: Addon for maintaining a list of items that you need and how many you already have.
+## Author: Kumodatsu
+## SavedVariables: ShoppingList_DB
+## SavedVariablesPerCharacter: ShoppingList_Char_DB
+## Version: 0.0.1
+
+src\output.lua
+src\command.lua
+src\saving.lua
+src\main.lua
