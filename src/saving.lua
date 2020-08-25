@@ -1,5 +1,11 @@
 local addon_name, SL = ...
 
+local get_qualified_name = function()
+    local name, _ = UnitName("player")
+    local realm   = GetRealmName()
+    return string.format("%s-%s", name, realm)
+end
+
 -- Handle loading/saving of data from/to file
 local on_addon_loaded = function()
     -- Account wide data
