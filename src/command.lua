@@ -6,6 +6,8 @@ SLASH_SHOPPING_LIST2 = "/shoppinglist"
 
 SL.Commands = { }
 
+M.MainCommand = function() end
+
 -- msg: str -> bool, str, table
 M.parse_cmd = function(msg)
     local tokens = {}
@@ -32,7 +34,7 @@ M.execute_cmd = function(name, args)
                 end
                 entry.Cmd(str)
             else
-                entry.Cmd ""    
+                entry.Cmd ""
             end
         else
             entry.Cmd(unpack(args))
@@ -58,6 +60,10 @@ M.add_cmd = function(name, f, description, packed)
 end
 
 SlashCmdList["SHOPPING_LIST"] = function(msg)
+    if not msg or msg == "" then
+        M.MainCommand()
+        return
+    end
     local success, name, args = M.parse_cmd(msg)
     if success then
         M.execute_cmd(name, args)
