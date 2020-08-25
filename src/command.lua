@@ -9,7 +9,7 @@ SL.Commands = { }
 -- msg: str -> bool, str, table
 M.parse_cmd = function(msg)
     local tokens = {}
-    for token in msg:gmatch("[_%w%-%.]+") do
+    for token in msg:gmatch("[^%s]+") do
         table.insert(tokens, token)
     end
     if #tokens == 0 then
