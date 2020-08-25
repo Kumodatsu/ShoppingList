@@ -8,5 +8,7 @@
 
 src\output.lua
 src\command.lua
+src\shopping.lua
+src\interface.lua
 src\saving.lua
 src\main.lua
