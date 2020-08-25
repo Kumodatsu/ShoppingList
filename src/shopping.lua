@@ -27,7 +27,7 @@ end
 local get_keys = function(t)
     local keys = {}
     for k, _ in pairs(t) do
-        keys[k] = true
+        keys[k] = 0
     end
     return keys
 end
@@ -72,8 +72,7 @@ local reset_list = function()
 end
 
 M.update_list = function()
-    reset_list()
-    local item_ids = get_keys(M.ShoppingList)
+    local item_counts = get_keys(M.ShoppingList)
     for bag_id = 0, 4 do
         local slot_count = GetContainerNumSlots(bag_id)
         if slot_count then
@@ -82,12 +81,18 @@ M.update_list = function()
                     GetContainerItemInfo(bag_id, slot_id)
                 if texture then
                     local item = disect_item_link(item_link)
-                    if item_ids[item.ItemID] then
-                        M.ShoppingList[item.ItemID].Obtained =
-                            M.ShoppingList[item.ItemID].Obtained + item_count
+                    if item_counts[item.ItemID] then
+                        item_counts[item.ItemID] = item_counts[item.ItemID] +
+                            item_count
                     end
                 end
             end
+        end
+    end
+    for item_id, item in pairs(M.ShoppingList) do
+        if item.Obtained ~= item_counts[item_id] then
+            M.ShoppingList[item.ID].Obtained = item_counts[item_id]
+            M.show_item(item)
         end
     end
 end
@@ -121,13 +126,17 @@ M.add_entry = function(input)
     M.update_list()
 end
 
+M.show_item = function(item)
+    local got_em = item.Obtained >= item.Required
+    SL.Print("%s%s: %d/%d", item.Link, got_em and "|cFF11FF33" or "",
+        item.Obtained, item.Required)
+end
+
 M.show_list = function()
     local empty = true
     for item_id, item in pairs(M.ShoppingList) do
         empty = false
-        local got_em = item.Obtained >= item.Required
-        SL.Print("%s%s: %d/%d", item.Link, got_em and "|cFF11FF33" or "",
-            item.Obtained, item.Required)
+        M.show_item(item)
     end
     if empty then
         SL.Print "Your shopping list is empty."
