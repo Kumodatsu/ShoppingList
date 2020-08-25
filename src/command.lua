@@ -84,8 +84,9 @@ local list_help = function(name)
 end
 
 M.add_cmd("help", list_help, [[
-"/sl help" shows the list of commands.
-"/sl help <command>" shows an explanation of the specified command.
+/sl help
+> "/sl help" shows the list of commands.
+> "/sl help <command>" shows an explanation of the specified command.
 ]])
 
 SL.Command = M
