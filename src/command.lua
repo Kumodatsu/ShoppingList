@@ -25,7 +25,15 @@ M.execute_cmd = function(name, args)
     local entry = SL.Commands[name]
     if entry ~= nil then
         if entry.Packed then
-            entry.Cmd(args)
+            if #args ~= 0 then
+                local str = args[1]
+                for i = 2, #args do
+                    str = str .. " " .. args[i]
+                end
+                entry.Cmd(str)
+            else
+                entry.Cmd ""    
+            end
         else
             entry.Cmd(unpack(args))
         end
