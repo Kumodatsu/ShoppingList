@@ -151,6 +151,8 @@ M.remove_entry = function(item_name)
     return false
 end
 
+SL.Command.MainCommand = M.show_list
+
 SL.Command.add_cmd("add", M.add_entry, [[
 /sl add
 > "/sl add <number> <item name>" adds the specified number of the specified item to your shopping list.
