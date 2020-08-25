@@ -6,7 +6,11 @@ local colors = {
 }
 
 local output = function(color, format, ...)
-    SendSystemMessage(string.format("|c%s%s|r", color, format):format(...))
+    SendSystemMessage(
+        string.format("|c%s%s", color, tostring(format))
+            :format(...)
+            :gsub("|r", string.format("|r|c%s", color))
+    )
 end
 
 SL.Print = function(format, ...)
