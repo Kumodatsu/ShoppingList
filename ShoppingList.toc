@@ -4,7 +4,7 @@
 ## Author: Kumodatsu
 ## SavedVariables: ShoppingList_DB
 ## SavedVariablesPerCharacter: ShoppingList_Char_DB
-## Version: 0.0.1
+## Version: 0.1.0
 
 src\output.lua
 src\command.lua
