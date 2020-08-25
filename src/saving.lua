@@ -9,16 +9,14 @@ end
 -- Handle loading/saving of data from/to file
 local on_addon_loaded = function()
     -- Account wide data
-    ShoppingList_DB      = ShoppingList_DB      or {}
-    -- Character specific data
-    ShoppingList_Char_DB = ShoppingList_Char_DB or {}
+    SL.Shopping.ShoppingList = ShoppingList_DB or {}
 end
 
 local on_addon_unloading = function()
-    
+    ShoppingList_DB = SL.Shopping.ShoppingList
 end
 
-local frame_load_vars = CreateFrame("FRAME", "SL_LoadData")
+local frame_load_vars = CreateFrame("Frame", "SL_LoadData")
 
 frame_load_vars:RegisterEvent("ADDON_LOADED")
 frame_load_vars:RegisterEvent("PLAYER_LOGOUT")
