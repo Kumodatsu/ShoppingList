@@ -5,6 +5,14 @@ M.ShoppingList = {
     
 }
 
+M.OnListUpdated = {}
+
+local on_list_updated = function()
+    for _, f in pairs(M.OnListUpdated) do
+        f()
+    end
+end
+
 M.create_entry = function(item_id, item_name, item_link, item_texture, required)
     M.ShoppingList[item_id] = {
         ID       = item_id,
@@ -71,7 +79,7 @@ local reset_list = function()
     end
 end
 
-M.update_list = function()
+M.update_list = function(updated)
     local item_counts = get_keys(M.ShoppingList)
     for bag_id = 0, 4 do
         local slot_count = GetContainerNumSlots(bag_id)
@@ -89,11 +97,16 @@ M.update_list = function()
             end
         end
     end
+    updated = updated or false
     for item_id, item in pairs(M.ShoppingList) do
         if item.Obtained ~= item_counts[item_id] then
+            updated = true
             M.ShoppingList[item.ID].Obtained = item_counts[item_id]
             M.show_item(item)
         end
+    end
+    if updated then
+        on_list_updated()
     end
 end
 
@@ -123,7 +136,7 @@ M.add_entry = function(input)
     end
     M.create_entry(item_id, item_name, item_link, item_texture, required)
     SL.Print("Added %dx%s to your shopping list.", required, item_link)
-    M.update_list()
+    M.update_list(true)
 end
 
 M.show_item = function(item)
@@ -145,6 +158,7 @@ end
 
 M.clear_list = function()
     M.ShoppingList = {}
+    on_list_updated()
     SL.Print "Shopping list cleared."
 end
 
@@ -153,10 +167,12 @@ M.remove_entry = function(item_name)
         if item.Name == item_name then
             local item_link = item.Link
             M.ShoppingList[item_id] = nil
+            on_list_updated()
             SL.Print("%s has been removed from your shopping list.", item_link)
             return true
         end
     end
+    SL.Error("\"%s\" doesn't appear on your shopping list.", item_name)
     return false
 end
 
