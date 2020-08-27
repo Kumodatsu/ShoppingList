@@ -180,6 +180,6 @@ SL.Command.add_cmd("clear", M.clear_list, [[
 SL.Command.add_cmd("remove", M.remove_entry, [[
 /sl remove
 > "/sl remove <item name>" removes the specified item from your shopping list.
-]])
+]], true)
 
 SL.Shopping = M
