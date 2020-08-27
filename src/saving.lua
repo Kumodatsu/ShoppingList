@@ -8,13 +8,18 @@ end
 
 -- Handle loading/saving of data from/to file
 local on_addon_loaded = function()
+    ShoppingList_DB = ShoppingList_DB or {}
     -- Account wide data
-    SL.Shopping.ShoppingList = ShoppingList_DB or {}
-    SL.Shopping.update_list(true)
+    SL.Shopping.ShoppingLists = ShoppingList_DB.ShoppingLists or {}
+    SL.Shopping.SelectedList  = ShoppingList_DB.SelectedList  or nil
+    if SL.Shopping.assert_list() then
+        SL.Shopping.update_list(true)
+    end
 end
 
 local on_addon_unloading = function()
-    ShoppingList_DB = SL.Shopping.ShoppingList
+    ShoppingList_DB.ShoppingLists = SL.Shopping.ShoppingLists
+    ShoppingList_DB.SelectedList  = SL.Shopping.SelectedList
 end
 
 local frame_load_vars = CreateFrame("Frame", "SL_LoadData")

@@ -1,20 +1,41 @@
 local addon_name, SL = ...
 local M = {}
 
-M.ShoppingList = {
-    
-}
+-- All shopping lists
+M.ShoppingLists = {}
+-- The currently selected shopping list
+M.SelectedList = nil
 
+-- Asserts whether a list is currently selected.
+M.assert_list = function(name)
+    return M.SelectedList ~= nil
+end
+
+-- Returns the currently selected shopping list.
+M.get_shopping_list = function()
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
+    return M.ShoppingLists[M.SelectedList]
+end
+
+-- Table of functions to run when the list is updated
 M.OnListUpdated = {}
 
+-- Runs all functions in OnListUpdated.
+-- This function should be called once when the list is updated.
 local on_list_updated = function()
     for _, f in pairs(M.OnListUpdated) do
         f()
     end
 end
 
+-- Makes a new entry for the specified item in the currently active shopping list.
 M.create_entry = function(item_id, item_name, item_link, item_texture, required)
-    M.ShoppingList[item_id] = {
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
+    M.get_shopping_list()[item_id] = {
         ID       = item_id,
         Name     = item_name,
         Link     = item_link,
@@ -74,13 +95,19 @@ local disect_item_link = function(item_link)
 end
 
 local reset_list = function()
-    for item_id, item in pairs(M.ShoppingList) do
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
+    for item_id, item in pairs(M.get_shopping_list()) do
         item.Obtained = 0
     end
 end
 
 M.update_list = function(updated)
-    local item_counts = get_keys(M.ShoppingList)
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
+    local item_counts = get_keys(M.get_shopping_list())
     for bag_id = 0, 4 do
         local slot_count = GetContainerNumSlots(bag_id)
         if slot_count then
@@ -98,10 +125,10 @@ M.update_list = function(updated)
         end
     end
     updated = updated or false
-    for item_id, item in pairs(M.ShoppingList) do
+    for item_id, item in pairs(M.get_shopping_list()) do
         if item.Obtained ~= item_counts[item_id] then
             updated = true
-            M.ShoppingList[item.ID].Obtained = item_counts[item_id]
+            M.get_shopping_list()[item.ID].Obtained = item_counts[item_id]
             M.show_item(item)
         end
     end
@@ -111,6 +138,9 @@ M.update_list = function(updated)
 end
 
 M.add_entry = function(input)
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
     if not input then
         return SL.Error "You must specify a number followed by the item name."
     end
@@ -146,8 +176,12 @@ M.show_item = function(item)
 end
 
 M.show_list = function()
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
+    SL.Print("Currently selected list: \"%s\".", M.SelectedList)
     local empty = true
-    for item_id, item in pairs(M.ShoppingList) do
+    for item_id, item in pairs(M.get_shopping_list()) do
         empty = false
         M.show_item(item)
     end
@@ -157,16 +191,22 @@ M.show_list = function()
 end
 
 M.clear_list = function()
-    M.ShoppingList = {}
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
+    M.ShoppingLists[M.SelectedList] = {}
     on_list_updated()
     SL.Print "Shopping list cleared."
 end
 
 M.remove_entry = function(item_name)
-    for item_id, item in pairs(M.ShoppingList) do
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
+    for item_id, item in pairs(M.get_shopping_list()) do
         if item.Name == item_name then
             local item_link = item.Link
-            M.ShoppingList[item_id] = nil
+            M.get_shopping_list()[item_id] = nil
             on_list_updated()
             SL.Print("%s has been removed from your shopping list.", item_link)
             return true
@@ -174,6 +214,56 @@ M.remove_entry = function(item_name)
     end
     SL.Error("\"%s\" doesn't appear on your shopping list.", item_name)
     return false
+end
+
+M.select_list = function(name)
+    if not M.ShoppingLists[name] then
+        return SL.Error "You don't have a shopping list with that name."
+    end
+    M.SelectedList = name
+    M.update_list(true)
+end
+
+M.new_list = function(name)
+    if M.ShoppingLists[name] then
+        return SL.Error "A shopping list with that name already exists."
+    end
+    M.ShoppingLists[name] = {}
+    M.select_list(name)
+    SL.Print("Created a new shopping list named \"%s\".", name)
+end
+
+M.show_current_list = function()
+    if not M.assert_list() then
+        return SL.Print "No list is currently selected."
+    end
+    SL.Print("Currently selected list: \"%s\".", M.SelectedList)
+end
+
+M.show_lists = function()
+    local empty = true
+    for name, list in pairs(M.ShoppingLists) do
+        if empty then
+            empty = false
+            SL.Print "Your shopping lists:"
+        end
+        SL.Print(name)
+    end
+    if empty then
+        SL.Print "You have no shopping lists."
+    end
+end
+
+M.delete_list = function(name)
+    if M.SelectedList == name then
+        M.SelectedList = nil
+    end
+    if M.ShoppingLists[name] then
+        M.ShoppingLists[name] = nil
+        SL.Print("Removed the shopping list \"%s\".", name)
+    else
+        SL.Error "You don't have a shopping list with that name."
+    end
 end
 
 SL.Command.MainCommand = M.show_list
@@ -196,6 +286,31 @@ SL.Command.add_cmd("clear", M.clear_list, [[
 SL.Command.add_cmd("remove", M.remove_entry, [[
 /sl remove
 > "/sl remove <item name>" removes the specified item from your shopping list.
+]], true)
+
+SL.Command.add_cmd("new", M.new_list, [[
+/sl new
+> "/sl new <name>" makes a new shopping list with the specified name.
+]], true)
+
+SL.Command.add_cmd("select", M.select_list, [[
+/sl select
+> "/sl select <name>" makes the shopping list with the given name the active shopping list.
+]], true)
+
+SL.Command.add_cmd("current", M.show_current_list, [[
+/sl current
+> "/sl current" shows which shopping list is currently selected.
+]])
+
+SL.Command.add_cmd("lists", M.show_lists, [[
+/sl lists
+> "/sl lists" shows which shopping lists you have.
+]])
+
+SL.Command.add_cmd("delete", M.delete_list, [[
+/sl delete
+> "/sl delete <name>" deletes the shopping list with the specified name.
 ]], true)
 
 SL.Shopping = M

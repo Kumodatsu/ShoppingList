@@ -15,8 +15,10 @@ local update_view = function(self)
         return
     end
     local item_ids = {}
-    for item_id in pairs(SL.Shopping.ShoppingList) do
-        table.insert(item_ids, item_id)
+    if SL.Shopping.assert_list() then
+        for item_id in pairs(SL.Shopping.get_shopping_list()) do
+            table.insert(item_ids, item_id)
+        end
     end
     table.sort(item_ids)
     FauxScrollFrame_Update(self, #item_ids, entries_per_view, entry_height)
@@ -26,7 +28,7 @@ local update_view = function(self)
         if line + offset > #item_ids then
             button:Hide()
         else
-            local item   = SL.Shopping.ShoppingList[item_ids[line + offset]]
+            local item   = SL.Shopping.get_shopping_list()[item_ids[line + offset]]
             local got_em = item.Obtained >= item.Required
             button:SetText(
                 string.format("|c%s%s (%d/%d)",
