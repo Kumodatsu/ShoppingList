@@ -1,0 +1,5 @@
+<Bindings>
+    <Binding name="TOGGLE_LIST_FRAME" header="SHOPPING_LIST">
+        SL_API.Interface.ToggleListFrame()
+    </Binding>
+</Bindings>

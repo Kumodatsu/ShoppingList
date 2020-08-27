@@ -16,3 +16,6 @@ SL.Command.add_cmd("version", show_version, [[
 -- Global addon getter
 SL_API = SL
 
+-- Key bindings
+BINDING_HEADER_SHOPPING_LIST   = "Shopping List"
+BINDING_NAME_TOGGLE_LIST_FRAME = "Toggle List Frame"
