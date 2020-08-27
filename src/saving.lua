@@ -10,6 +10,7 @@ end
 local on_addon_loaded = function()
     -- Account wide data
     SL.Shopping.ShoppingList = ShoppingList_DB or {}
+    SL.Shopping.update_list(true)
 end
 
 local on_addon_unloading = function()
