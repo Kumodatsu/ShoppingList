@@ -1,4 +1,4 @@
-## Interface: 80300
+## Interface: 90001
 ## Title: Shopping List
 ## Notes: Addon for maintaining a list of items that you need and how many you already have.
 ## Author: Kumodatsu

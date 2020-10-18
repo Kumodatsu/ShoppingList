@@ -8,7 +8,7 @@ local entries_per_view = 8
 local buttons = {}
 
 local list_frame = CreateFrame("ScrollFrame", "SL_ListFrame", UIParent,
-    "FauxScrollFrameTemplate")
+    "FauxScrollFrameTemplate" .. (BackdropTemplateMixin and ",BackdropTemplate" or ""))
 
 local update_view = function(self)
     if not self:IsVisible() then
