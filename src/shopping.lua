@@ -87,11 +87,18 @@ local create_item_data = function(item_id, enchant_id, gem_id1, gem_id2,
 end
 
 local disect_item_link = function(item_link)
-    local item_pattern =
-        "|c........|Hitem" ..
-        replicate_string(":(%d*)", 16) ..
-        "|h%[([^%]]+)%]|h"
-    return create_item_data(select(3, item_link:find(item_pattern)))
+    local _, _, color, ltype, id, enchant, gem1, gem2, gem3, gem4,
+        suffix, unique, link_lvl, name = item_link:find "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?"
+    return create_item_data(
+        id,
+        enchant,
+        gem1, gem2, gem3, gem4,
+        suffix,
+        unique,
+        link_lvl,
+        nil, nil, nil, nil, nil, nil, nil,
+        name
+    )
 end
 
 local reset_list = function()
