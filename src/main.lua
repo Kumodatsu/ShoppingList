@@ -6,6 +6,7 @@ local show_version = function()
     local title   = GetAddOnMetadata(addon_name, "title")
     local version = GetAddOnMetadata(addon_name, "version")
     SL.Print("%s's %s, version %s", author, title, version)
+    SL.Print "See the LICENSE file that came with the addon for licensing information."
 end
 
 SL.Command.add_cmd("version", show_version, [[
