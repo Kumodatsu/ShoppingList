@@ -6,8 +6,13 @@
 ## SavedVariablesPerCharacter: ShoppingList_Char_DB
 ## Version: 0.1.1
 
+data\data.lua
+data\items.lua
+data\lists.lua
+
 src\output.lua
 src\command.lua
+src\data.lua
 src\shopping.lua
 src\interface.lua
 src\saving.lua

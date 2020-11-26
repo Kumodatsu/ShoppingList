@@ -164,10 +164,19 @@ M.add_entry = function(input)
     local item_name    = item_info[1]
     local item_link    = item_info[2]
     local item_texture = item_info[10]
+    local item_id      = nil
     if not item_link then
-        return SL.Error "Can't find the specified item."
+        item = SL.Data.Get(item)
+        if not item then
+            return SL.Error "Can't find the specified item."
+        end
+        item_id      = item.ID
+        item_name    = item.Name
+        item_link    = item.Link
+        item_texture = item.Texture
+    else
+        item_id      = disect_item_link(item_link).ItemID
     end
-    local item_id      = disect_item_link(item_link).ItemID
     if item_id == 0 then
         return SL.Error "Could not get the item ID of the specified item."
     end
@@ -233,11 +242,13 @@ end
 
 M.new_list = function(name)
     if M.ShoppingLists[name] then
-        return SL.Error "A shopping list with that name already exists."
+        SL.Error "A shopping list with that name already exists."
+        return false
     end
     M.ShoppingLists[name] = {}
     M.select_list(name)
     SL.Print("Created a new shopping list named \"%s\".", name)
+    return true
 end
 
 M.show_current_list = function()
@@ -273,7 +284,23 @@ M.delete_list = function(name)
     end
 end
 
+M.import_list = function(name)
+    local list = SL.Data.Import(name)
+    if not list then
+        return SL.Error "No list with that name exists in the database."
+    end
+    if not M.new_list(name) then return end
+    M.ShoppingLists[name] = list
+    SL.Print("Imported list \"%s\" from the database.", name)
+    M.update_list(true)
+end
+
 SL.Command.MainCommand = M.show_list
+
+SL.Command.add_cmd("import", M.import_list, [[
+/sl import
+> "/sl import <list name>" imports a list from the database.
+]], true)
 
 SL.Command.add_cmd("add", M.add_entry, [[
 /sl add
