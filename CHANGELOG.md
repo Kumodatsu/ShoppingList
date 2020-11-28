@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Item database containing information about some crafting ingredients.
 - List database containing some premade lists for leveling crafting professions.
+- Item tracking: a way to add items to the list without a specific number requirement.
 - Command: `/sl import` to import a list from the database.
+- Command: `/sl track` to track an item without a number requirement.
 
 ## [0.1.1] - 2020-11-25
 ### Added

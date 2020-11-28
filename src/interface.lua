@@ -29,12 +29,18 @@ local update_view = function(self)
             button:Hide()
         else
             local item   = SL.Shopping.get_shopping_list()[item_ids[line + offset]]
-            local got_em = item.Obtained >= item.Required
-            button:SetText(
-                string.format("|c%s%s (%d/%d)",
-                    got_em and "FF11FF33" or "FF2299FF",
-                    item.Name, item.Obtained, item.Required)
-            )
+            if item.Required then
+                local got_em = item.Obtained >= item.Required
+                button:SetText(
+                    string.format("|c%s%s (%d/%d)",
+                        got_em and "FF11FF33" or "FF2299FF",
+                        item.Name, item.Obtained, item.Required)
+                )
+            else
+                button:SetText(
+                    string.format("|cFFFFFFFF%s (%d)", item.Name, item.Obtained)
+                )
+            end
             button.texture:SetTexture(item.Texture)
             button:Show()
         end

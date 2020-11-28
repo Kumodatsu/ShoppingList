@@ -185,10 +185,43 @@ M.add_entry = function(input)
     M.update_list(true)
 end
 
+M.track_entry = function(input)
+    if not M.assert_list() then
+        return SL.Error "No list is currently selected."
+    end
+    if not input then
+        return SL.Error "You must specify the item name."
+    end
+    local item_info    = { GetItemInfo(input) }
+    local item_name    = item_info[1]
+    local item_link    = item_info[2]
+    local item_texture = item_info[10]
+    local item_id      = nil
+    if not item_link then
+        local item   = SL.Data.Get(input)
+        item_id      = item.ID
+        item_name    = item.Name
+        item_link    = item.Link
+        item_texture = item.Texture
+    else
+        item_id = disect_item_link(item_link).ItemID
+    end
+    if item_id == 0 then
+        return SL.Error "Could not get the item ID of the specified item."
+    end
+    M.create_entry(item_id, item_name, item_link, item_texture, nil)
+    SL.Print("Tracking %s in your shopping list.", item_link)
+    M.update_list(true)
+end
+
 M.show_item = function(item)
-    local got_em = item.Obtained >= item.Required
-    SL.Print("%s%s: %d/%d", item.Link, got_em and "|cFF11FF33" or "",
-        item.Obtained, item.Required)
+    if item.Required then
+        local got_em = item.Obtained >= item.Required  
+        SL.Print("%s%s: %d/%d", item.Link, got_em and "|cFF11FF33" or "",
+            item.Obtained, item.Required)
+    else
+        SL.Print("%s|cFFFFFFFF: %d", item.Link, item.Obtained)
+    end
 end
 
 M.show_list = function()
@@ -305,6 +338,11 @@ SL.Command.add_cmd("import", M.import_list, [[
 SL.Command.add_cmd("add", M.add_entry, [[
 /sl add
 > "/sl add <number> <item name>" adds the specified number of the specified item to your shopping list.
+]], true)
+
+SL.Command.add_cmd("track", M.track_entry, [[
+/sl track
+> "/sl track <item name>" adds the item to your shopping list without target number.
 ]], true)
 
 SL.Command.add_cmd("show", M.show_list, [[
